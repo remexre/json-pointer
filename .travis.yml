@@ -7,12 +7,14 @@ os:
   - linux
   - osx
 script:
-  - cargo build --verbose
-  - cargo test --verbose
-  - cargo run --example create_from_str_array
-  - cargo doc
+  - cargo build --verbose $FEATURES
+  - cargo test --verbose $FEATURES
+  - cargo run --example create_from_str_array $FEATURES
+  - cargo doc $FEATURES
 env:
   - FEATURES=
-  - FEATURES=resolve_file_uris
-  - FEATURES=resolve_http_uris
-  - FEATURES=resolve_file_uris resolve_http_uris
+  - FEATURES="--features \"resolve_file_uris\""
+  - FEATURES="--features \"resolve_http_uris\""
+  - FEATURES="--features \"resolve_file_uris resolve_http_uris\""
+matrix:
+  fast_finish: true
