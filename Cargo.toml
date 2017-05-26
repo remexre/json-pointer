@@ -5,6 +5,7 @@ documentation = "https://docs.rs/json-pointer"
 homepage = "https://github.com/remexre/json-pointer"
 license = "MIT"
 name = "json-pointer"
+readme = "README.md"
 repository = "https://github.com/remexre/json-pointer"
 version = "0.1.0"
 

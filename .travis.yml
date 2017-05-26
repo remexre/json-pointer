@@ -6,4 +6,5 @@ rust:
 script:
   - cargo build --verbose
   - cargo test --verbose
+  - cargo run --example create_from_str_array
   - cargo doc
