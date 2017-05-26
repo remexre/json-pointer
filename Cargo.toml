@@ -1,0 +1,14 @@
+[package]
+authors = ["Nathaniel Ringo <remexre@gmail.com>"]
+description = "A crate for parsing and using JSON pointers, as specified in RFC 6901."
+name = "json-pointer"
+version = "0.1.0"
+
+[dependencies]
+itertools = "^0.6.0"
+serde_json = "^1.0.2"
+
+[dev-dependencies]
+lazy_static = "^0.2.8"
+quickcheck = "^0.4.1"
+regex = "^0.2.2"
