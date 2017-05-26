@@ -4,6 +4,7 @@ A crate for parsing and using JSON pointers, as specified in RFC 6901.
 
 [![crates.io](https://img.shields.io/crates/v/json-pointer.svg)](https://crates.io/crates/json-pointer)
 [![Build Status](https://travis-ci.org/remexre/json-pointer.svg?branch=master)](https://travis-ci.org/remexre/json-pointer)
+[![Documentation](https://docs.rs/json-pointer/badge.svg)](https://docs.rs/mio)
 
 ## Creating a JSON Pointer
 
