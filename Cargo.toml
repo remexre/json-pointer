@@ -1,6 +1,7 @@
 [package]
 authors = ["Nathaniel Ringo <remexre@gmail.com>"]
 description = "A crate for parsing and using JSON pointers, as specified in RFC 6901."
+license = "MIT"
 name = "json-pointer"
 version = "0.1.0"
 
