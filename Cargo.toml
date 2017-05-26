@@ -1,9 +1,15 @@
 [package]
 authors = ["Nathaniel Ringo <remexre@gmail.com>"]
 description = "A crate for parsing and using JSON pointers, as specified in RFC 6901."
+documentation = "https://docs.rs/json-pointer"
+homepage = "https://github.com/remexre/json-pointer"
 license = "MIT"
 name = "json-pointer"
+repository = "https://github.com/remexre/json-pointer"
 version = "0.1.0"
+
+[badges]
+travis-ci = { repository = "remexre/json-pointer", branch = "master" }
 
 [dependencies]
 itertools = "^0.6.0"
