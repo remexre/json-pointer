@@ -2,6 +2,10 @@
 
 #![deny(missing_docs)]
 
+#[cfg(hyper)]
+extern crate hyper;
+#[cfg(url)]
+extern crate url;
 extern crate serde_json;
 
 mod parser;
