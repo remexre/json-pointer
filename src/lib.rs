@@ -10,8 +10,6 @@
 //! 
 //! ```rust
 //! extern crate json_pointer;
-//! #[macro_use]
-//! extern crate serde_json;
 //!
 //! use json_pointer::JsonPointer;
 //!
@@ -65,8 +63,6 @@
 //! 
 //! ```rust
 //! extern crate json_pointer;
-//! #[macro_use]
-//! extern crate serde_json;
 //!
 //! use json_pointer::JsonPointer;
 //!
