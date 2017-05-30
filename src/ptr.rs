@@ -10,6 +10,7 @@ use std::str::FromStr;
 ///
 /// Create a new JSON pointer with [`JsonPointer::new`](#method.new), or parse one from a
 /// string with [`str::parse()`](https://doc.rust-lang.org/std/primitive.str.html#method.parse).
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct JsonPointer<S: AsRef<str>, C: AsRef<[S]>> {
     ref_toks: C,
     _phantom: PhantomData<S>,
