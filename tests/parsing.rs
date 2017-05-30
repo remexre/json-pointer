@@ -11,15 +11,20 @@ use regex::Regex;
 
 quickcheck! {
 
-/// Essentially, `unparse(parse("..."))` should be a no-op.
+/// Essentially, `unparse(parse("..."))` should be a no-op when not in URI
+/// Fragment Identifier Representation.
 fn faithful_parse(s: String) -> TestResult {
-    match s.parse::<JsonPointer<_, _>>() {
-        Ok(ptr) => if s == ptr.to_string() {
+    if s.chars().next() == Some('#') {
+        TestResult::discard()
+    } else {
+        match s.parse::<JsonPointer<_, _>>() {
+            Ok(ptr) => if s == ptr.to_string() {
             TestResult::passed()
-        } else {
-            TestResult::failed()
-        },
-        Err(_) => TestResult::discard(),
+            } else {
+                TestResult::failed()
+            },
+            Err(_) => TestResult::discard(),
+        }
     }
 }
 
