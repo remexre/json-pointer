@@ -1,7 +1,7 @@
 //! A parser for JSON pointers.
 
-use Error;
 use JsonPointer;
+use parser::ParseError;
 
 /// A single token encountered when parsing a JSON pointer.
 #[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
@@ -35,7 +35,7 @@ impl Into<char> for Escape {
 
 /// A parser for JSON pointers. Note that this parser does *not* handle URI
 /// Fragment Identifier Representation (part 6 of RFC 6901).
-pub fn parse<II: IntoIterator<Item=char>>(ii: II) -> Result<JsonPointer<String, Vec<String>>, Error> {
+pub fn parse<II: IntoIterator<Item=char>>(ii: II) -> Result<JsonPointer<String, Vec<String>>, ParseError> {
     // Tokenize the input.
     let toks = Tokenizer::new(ii).collect::<Result<Vec<_>, _>>()?;
 
@@ -44,7 +44,7 @@ pub fn parse<II: IntoIterator<Item=char>>(ii: II) -> Result<JsonPointer<String, 
 
     // Check to be sure that the JSON pointer started with a slash.
     if iter.next().map(|s| s.len() > 0).unwrap_or(false) {
-        return Err(Error::NoLeadingSlash);
+        return Err(ParseError::NoLeadingSlash);
     }
 
     let mut parts = Vec::new();
@@ -60,7 +60,7 @@ pub fn parse<II: IntoIterator<Item=char>>(ii: II) -> Result<JsonPointer<String, 
         }
         parts.push(part);
     }
-    Ok(parts.into_iter().collect())
+    Ok(JsonPointer::new(parts.into_iter().collect()))
 }
 
 /// The tokenizer for the parser.
@@ -78,15 +78,15 @@ impl<I: Iterator<Item=char>> Tokenizer<I> {
 }
 
 impl<I: Iterator<Item=char>> Iterator for Tokenizer<I> {
-    type Item = Result<Token, Error>;
+    type Item = Result<Token, ParseError>;
     fn next(&mut self) -> Option<Self::Item> {
         match self.iter.next() {
             Some('/') => Some(Ok(Token::Slash)),
             Some('~') => match self.iter.next() {
                 Some('0') => Some(Ok(Token::Escaped(Escape::Tilde))),
                 Some('1') => Some(Ok(Token::Escaped(Escape::Slash))),
-                Some(c) => Some(Err(Error::InvalidEscape(c))),
-                None => Some(Err(Error::EndInEscape)),
+                Some(c) => Some(Err(ParseError::InvalidEscape(format!("~{}", c)))),
+                None => Some(Err(ParseError::InvalidEscape("~".to_string()))),
             },
             Some(c) => Some(Ok(Token::Literal(c))),
             None => None,

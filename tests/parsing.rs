@@ -11,15 +11,20 @@ use regex::Regex;
 
 quickcheck! {
 
-/// Essentially, `unparse(parse("..."))` should be a no-op.
+/// Essentially, `unparse(parse("..."))` should be a no-op when not in URI
+/// Fragment Identifier Representation.
 fn faithful_parse(s: String) -> TestResult {
-    match s.parse::<JsonPointer<_, _>>() {
-        Ok(ptr) => if s == ptr.to_string() {
+    if s.chars().next() == Some('#') {
+        TestResult::discard()
+    } else {
+        match s.parse::<JsonPointer<_, _>>() {
+            Ok(ptr) => if s == ptr.to_string() {
             TestResult::passed()
-        } else {
-            TestResult::failed()
-        },
-        Err(_) => TestResult::discard(),
+            } else {
+                TestResult::failed()
+            },
+            Err(_) => TestResult::discard(),
+        }
     }
 }
 
@@ -28,9 +33,10 @@ fn faithful_parse(s: String) -> TestResult {
 fn parses_all_valid(s: String) -> bool {
     lazy_static! {
         static ref JSON_POINTER_REGEX: Regex = Regex::new("^(/([^/~]|~[01])*)*$").unwrap();
+        static ref URI_FRAGMENT_REGEX: Regex = Regex::new("^#(/([^/~%]|~[01]|%[0-9a-fA-F]{2})*)*$").unwrap();
     }
 
-    let matches_regex = JSON_POINTER_REGEX.is_match(&s);
+    let matches_regex = JSON_POINTER_REGEX.is_match(&s) || URI_FRAGMENT_REGEX.is_match(&s);
     let parses = s.parse::<JsonPointer<_, _>>().is_ok();
 
     (matches_regex == parses)
