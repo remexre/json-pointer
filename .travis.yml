@@ -7,10 +7,10 @@ os:
   - linux
   - osx
 script:
-  - cargo build --verbose $FEATURES
-  - cargo test --verbose $FEATURES
-  - cargo run --example create_from_str_array $FEATURES
-  - cargo doc $FEATURES
+  - cargo build --verbose
+  - cargo test --verbose
+  - cargo run --example create_from_str_array
+  - cargo doc
 env:
   - QUICKCHECK_TESTS=10000 QUICKCHECK_MAX_TESTS=1000000
 matrix:
