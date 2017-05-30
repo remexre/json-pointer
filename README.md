@@ -1,9 +1,9 @@
 # json-pointer
 
-A crate for parsing and using JSON pointers, as specified in RFC 6901.
+A crate for parsing and using JSON pointers, as specified in [RFC 6901](https://tools.ietf.org/html/rfc6901).
 
-[![crates.io](https://img.shields.io/crates/v/json-pointer.svg)](https://crates.io/crates/json-pointer)
 [![Build Status](https://travis-ci.org/remexre/json-pointer.svg?branch=master)](https://travis-ci.org/remexre/json-pointer)
+[![crates.io](https://img.shields.io/crates/v/json-pointer.svg)](https://crates.io/crates/json-pointer)
 [![Documentation](https://docs.rs/json-pointer/badge.svg)](https://docs.rs/json-pointer)
 
 ## Creating a JSON Pointer
@@ -40,3 +40,11 @@ let indexed = ptr.get(&document).unwrap();
 
 assert_eq!(indexed, &json!(0));
 ```
+
+## URI Fragment Identifier Representation
+
+JSON Pointers can be embedded in the fragment portion of a URI. This is the
+reason why most JSON pointer libraries require a `#` character at the beginning
+of a JSON pointer. The crate will detect the leading `#` as an indicator to
+parse in URI Fragment Identifier Representation. Note that this means that this
+crate does not support parsing full URIs.

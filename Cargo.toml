@@ -7,21 +7,18 @@ license = "MIT"
 name = "json-pointer"
 readme = "README.md"
 repository = "https://github.com/remexre/json-pointer"
-version = "0.2.0"
+version = "0.3.0"
 
 [badges]
-travis-ci = { repository = "remexre/json-pointer", branch = "master" }
+
+[badges.travis-ci]
+branch = "master"
+repository = "remexre/json-pointer"
 
 [dependencies]
 serde_json = "^1.0.2"
-hyper = { version = "^0.10.9", optional = true }
-url = { version = "1.4.0", optional = true }
 
 [dev-dependencies]
 lazy_static = "^0.2.8"
 quickcheck = "^0.4.1"
 regex = "^0.2.2"
-
-[features]
-resolve_file_uris = ["url"]
-resolve_http_uris = ["hyper", "url"]

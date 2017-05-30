@@ -13,8 +13,6 @@ script:
   - cargo doc $FEATURES
 env:
   - FEATURES=
-  - FEATURES="--features \"resolve_file_uris\""
-  - FEATURES="--features \"resolve_http_uris\""
-  - FEATURES="--features \"resolve_file_uris resolve_http_uris\""
+  - FEATURES="--no-default-features"
 matrix:
   fast_finish: true
