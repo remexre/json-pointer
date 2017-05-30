@@ -11,8 +11,5 @@ script:
   - cargo test --verbose $FEATURES
   - cargo run --example create_from_str_array $FEATURES
   - cargo doc $FEATURES
-env:
-  - FEATURES=
-  - FEATURES="--no-default-features"
 matrix:
   fast_finish: true
