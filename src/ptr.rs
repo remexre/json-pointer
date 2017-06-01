@@ -96,6 +96,18 @@ impl<S: AsRef<str>, C: AsRef<[S]>> JsonPointer<S, C> {
     }
 }
 
+impl<S: AsRef<str>> JsonPointer<S, Vec<S>> {
+    /// Adds a component to the JSON pointer.
+    pub fn push(&mut self, component: S) {
+        self.ref_toks.push(component);
+    }
+
+    /// Removes and returns the last component from the JSON pointer.
+    pub fn pop(&mut self) -> Option<S> {
+        self.ref_toks.pop()
+    }
+}
+
 impl<S: AsRef<str>, C: AsRef<[S]>> Display for JsonPointer<S, C> {
     fn fmt(&self, fmt: &mut Formatter) -> FmtResult {
         for part in self.ref_toks.as_ref().iter() {
