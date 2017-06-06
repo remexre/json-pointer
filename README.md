@@ -1,6 +1,9 @@
 # json-pointer
 
-A crate for parsing and using JSON pointers, as specified in [RFC 6901](https://tools.ietf.org/html/rfc6901).
+A crate for parsing and using JSON pointers, as specified in [RFC
+6901](https://tools.ietf.org/html/rfc6901). Unlike the `pointer` method
+built into `serde_json`, this handles both validating JSON Pointers before
+use and the URI Fragment Identifier Representation.
 
 [![Build Status](https://travis-ci.org/remexre/json-pointer.svg?branch=master)](https://travis-ci.org/remexre/json-pointer)
 [![crates.io](https://img.shields.io/crates/v/json-pointer.svg)](https://crates.io/crates/json-pointer)
