@@ -2,6 +2,7 @@ use parser::{parse, ParseError};
 use serde_json::Value;
 use std::fmt::{Display, Formatter};
 use std::fmt::Result as FmtResult;
+use std::fmt::Write;
 use std::marker::PhantomData;
 use std::ops::{Index, IndexMut};
 use std::str::FromStr;
@@ -93,6 +94,30 @@ impl<S: AsRef<str>, C: AsRef<[S]>> JsonPointer<S, C> {
                 _ => Err(IndexError::NotIndexable),
             }
         }))
+    }
+
+    /// Converts a JSON pointer to a string in URI Fragment Identifier
+    /// Representation, including the leading `#`.
+    pub fn uri_fragment(&self) -> String {
+        fn legal_fragment_byte(b: u8) -> bool {
+            match b {
+                0x21 | 0x24 | 0x26...0x3b | 0x3d | 0x3f...0x5a | 0x5f | 0x61...0x7a => true,
+                _ => false,
+            }
+        }
+
+        let mut s = "#".to_string();
+        for part in self.ref_toks.as_ref().iter() {
+            s += "/";
+            for b in part.as_ref().bytes() {
+                if legal_fragment_byte(b) {
+                    s.push(b as char)
+                } else {
+                    write!(s, "%{:02x}", b).unwrap()
+                }
+            }
+        }
+        s
     }
 }
 

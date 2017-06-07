@@ -11,20 +11,20 @@ use regex::Regex;
 
 quickcheck! {
 
-/// Essentially, `unparse(parse("..."))` should be a no-op when not in URI
-/// Fragment Identifier Representation.
+/// Essentially, `unparse(parse("..."))` should be a no-op.
 fn faithful_parse(s: String) -> TestResult {
-    if s.chars().next() == Some('#') {
-        TestResult::discard()
+    let ok = match s.parse::<JsonPointer<_, _>>() {
+        Ok(ptr) => if s.chars().next() == Some('#') {
+            (s == ptr.uri_fragment())
+        } else {
+            (s == ptr.to_string())
+        },
+        Err(_) => return TestResult::discard(),
+    };
+    if ok {
+        TestResult::passed()
     } else {
-        match s.parse::<JsonPointer<_, _>>() {
-            Ok(ptr) => if s == ptr.to_string() {
-            TestResult::passed()
-            } else {
-                TestResult::failed()
-            },
-            Err(_) => TestResult::discard(),
-        }
+        TestResult::failed()
     }
 }
 
@@ -33,7 +33,7 @@ fn faithful_parse(s: String) -> TestResult {
 fn parses_all_valid(s: String) -> bool {
     lazy_static! {
         static ref JSON_POINTER_REGEX: Regex = Regex::new("^(/([^/~]|~[01])*)*$").unwrap();
-        static ref URI_FRAGMENT_REGEX: Regex = Regex::new("^#(/([^/~%]|~[01]|%[0-9a-fA-F]{2})*)*$").unwrap();
+        static ref URI_FRAGMENT_REGEX: Regex = Regex::new("^#(/([^A-Za-z0-9._!$&'()*+,;=@/?-]|~[01]|%[0-9a-fA-F]{2})*)*$").unwrap();
     }
 
     let matches_regex = JSON_POINTER_REGEX.is_match(&s) || URI_FRAGMENT_REGEX.is_match(&s);
