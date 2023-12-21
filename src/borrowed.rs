@@ -8,7 +8,7 @@ impl<'value,S: AsRef<str>, C: AsRef<[S]>> JsonPointerValueGetter<simd_json::Borr
     /// Attempts to get a reference to a value from the given JSON value,
     /// returning an error if it can't be found.
     fn get<'json>(&self, val: &'json simd_json::BorrowedValue<'value>) -> Result<&'json simd_json::BorrowedValue<'value>, IndexError> {
-        self.ref_toks.as_ref().iter().fold(Ok(val), |val, tok| val.and_then(|val| {
+        self.ref_toks.as_ref().iter().try_fold(val, |val, tok| {
             let tok = tok.as_ref();
             match *val {
                 simd_json::BorrowedValue::Object(ref obj) => obj.get(tok).ok_or_else(|| IndexError::NoSuchKey(tok.to_owned())),
@@ -24,13 +24,13 @@ impl<'value,S: AsRef<str>, C: AsRef<[S]>> JsonPointerValueGetter<simd_json::Borr
                 },
                 _ => Err(IndexError::NotIndexable),
             }
-        }))
+        })
     }
 
     /// Attempts to get a mutable reference to a value from the given JSON
     /// value, returning an error if it can't be found.
     fn get_mut<'json>(&self, val: &'json mut simd_json::BorrowedValue<'value>) -> Result<&'json mut simd_json::BorrowedValue<'value>, IndexError> {
-        self.ref_toks.as_ref().iter().fold(Ok(val), |val, tok| val.and_then(|val| {
+        self.ref_toks.as_ref().iter().try_fold(val, |val, tok| {
             let tok = tok.as_ref();
             match *val {
                 simd_json::BorrowedValue::Object(ref mut obj) => obj.get_mut(tok).ok_or_else(|| IndexError::NoSuchKey(tok.to_owned())),
@@ -46,13 +46,13 @@ impl<'value,S: AsRef<str>, C: AsRef<[S]>> JsonPointerValueGetter<simd_json::Borr
                 },
                 _ => Err(IndexError::NotIndexable),
             }
-        }))
+        })
     }
 
     /// Attempts to get an owned value from the given JSON value, returning an
     /// error if it can't be found.
     fn get_owned(&self, val: simd_json::BorrowedValue<'value>) -> Result<simd_json::BorrowedValue<'value>, IndexError> {
-        self.ref_toks.as_ref().iter().fold(Ok(val), |val, tok| val.and_then(|val| {
+        self.ref_toks.as_ref().iter().try_fold(val, |val, tok| {
             let tok = tok.as_ref();
             match val {
                 simd_json::BorrowedValue::Object(mut obj) => obj.remove(tok).ok_or_else(|| IndexError::NoSuchKey(tok.to_owned())),
@@ -72,7 +72,7 @@ impl<'value,S: AsRef<str>, C: AsRef<[S]>> JsonPointerValueGetter<simd_json::Borr
                 },
                 _ => Err(IndexError::NotIndexable),
             }
-        }))
+        })
     }
 }
 

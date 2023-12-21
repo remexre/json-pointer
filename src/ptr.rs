@@ -30,10 +30,7 @@ impl<S: AsRef<str>, C: AsRef<[S]>> JsonPointer<S, C> {
     /// Representation, including the leading `#`.
     pub fn uri_fragment(&self) -> String {
         fn legal_fragment_byte(b: u8) -> bool {
-            match b {
-                0x21 | 0x24 | 0x26..=0x3b | 0x3d | 0x3f..=0x5a | 0x5f | 0x61..=0x7a => true,
-                _ => false,
-            }
+            matches!(b, 0x21 | 0x24 | 0x26..=0x3b | 0x3d | 0x3f..=0x5a | 0x5f | 0x61..=0x7a)
         }
 
         let mut s = "#".to_string();
