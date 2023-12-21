@@ -27,7 +27,7 @@ macro_rules! rfc_tests {
         fn rfc_tests() {
             $({
                 let ptr = $ptr.parse::<JsonPointer<_, _>>().unwrap();
-                assert_eq!(ptr.get(Lazy::get(&JSON).unwrap()).unwrap(), &json!($json));
+                assert_eq!(ptr.get(Lazy::force(&JSON)).unwrap(), &json!($json));
             })*
         }
     }
