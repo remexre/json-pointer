@@ -1,8 +1,6 @@
-extern crate json_pointer;
-#[macro_use]
-extern crate serde_json;
-
-use json_pointer::JsonPointer;
+use json_pointer_simd::JsonPointer;
+use simd_json::json;
+use json_pointer_simd::JsonPointerValueGetter;
 
 fn main() {
     let ptr = JsonPointer::new([

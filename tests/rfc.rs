@@ -1,14 +1,11 @@
-extern crate json_pointer;
-#[macro_use]
-extern crate lazy_static;
-#[macro_use]
-extern crate serde_json;
+use json_pointer_simd::JsonPointer;
+use json_pointer_simd::JsonPointerValueGetter;
+use once_cell::sync::Lazy;
+use simd_json::OwnedValue;
+use simd_json::json;
 
-use json_pointer::JsonPointer;
-use serde_json::Value;
-
-lazy_static! {
-    static ref JSON: Value = json!({
+static JSON: Lazy<OwnedValue> = Lazy::new(||
+    json!({
         "foo": ["bar", "baz"],
         "": 0,
         "a/b": 1,
@@ -19,8 +16,8 @@ lazy_static! {
         "k\"l": 6,
         " ": 7,
         "m~n": 8,
-    });
-}
+    })
+);
 
 macro_rules! rfc_tests {
     ($($ptr:expr => $json:tt;)*) => {
@@ -30,7 +27,7 @@ macro_rules! rfc_tests {
         fn rfc_tests() {
             $({
                 let ptr = $ptr.parse::<JsonPointer<_, _>>().unwrap();
-                assert_eq!(ptr.get(&JSON).unwrap(), &json!($json));
+                assert_eq!(ptr.get(Lazy::get(&JSON).unwrap()).unwrap(), &json!($json));
             })*
         }
     }

@@ -1,13 +1,21 @@
 # json-pointer
 
+This crate is a straight conversion of the [json-pointer]() crate, but for use
+with `simd_json` instead of `serde_json`. While simde_json and serde_json expose
+similar APIs, neither attempts to implement the traits of the other, making an 
+across-the-board generic implementation quite difficult to achieve. So, instead, I
+opted to fork the original project and adapt it to simd_json Value types. The fact
+is that if you persuaded by the benefits of simd_json, you can pretty much drop it
+in to standard ser/deser workloads in place of serde_json.
+
+I also made some updates to the code to use the 2021 semantics of Rust.
+
+Otherwise, all the code, examples, and tests are those of the original author.
+
 A crate for parsing and using JSON pointers, as specified in [RFC
 6901](https://tools.ietf.org/html/rfc6901). Unlike the `pointer` method
 built into `serde_json`, this handles both validating JSON Pointers before
 use and the URI Fragment Identifier Representation.
-
-[![Build Status](https://travis-ci.org/remexre/json-pointer.svg?branch=master)](https://travis-ci.org/remexre/json-pointer)
-[![crates.io](https://img.shields.io/crates/v/json-pointer.svg)](https://crates.io/crates/json-pointer)
-[![Documentation](https://docs.rs/json-pointer/badge.svg)](https://docs.rs/json-pointer)
 
 ## Creating a JSON Pointer
 
