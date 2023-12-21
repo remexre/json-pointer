@@ -1,4 +1,4 @@
-//! A crate for parsing and using JSON pointers with simd_json values, as specified in [RFC
+//! A crate for parsing and using JSON pointers with [simd_json] values, as specified in [RFC
 //! 6901](https://tools.ietf.org/html/rfc6901). Unlike the `pointer` method
 //! built into `serde_json`, this handles both validating JSON Pointers before
 //! use and the URI Fragment Identifier Representation.
