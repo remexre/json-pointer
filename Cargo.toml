@@ -7,7 +7,7 @@ license = "MIT"
 name = "json-pointer-simd"
 readme = "README.md"
 repository = "https://github.com/bassmanitram/json-pointer-simd"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 
 [dependencies]
