@@ -1,13 +1,28 @@
 # json-pointer
 
+## Preamble
+This crate is a generalization of the [json-pointer](https://github.com/remexre/json-pointer) crate.
+
+It opens up the target of the JSON pointer to anything that can be adapted using the `JsonPointerTarget`
+trait. The odd name of the crate (_.simd_) comes from the first use case and first attempt at implementation -
+- using JSON Pointers with [simd-json](https://docs.rs/simd-json/latest/simd_json) Values.
+
+But one learns in these efforts and the back-implementation of the `JsonPointerTarget` trait to re-include 
+[serde_json] values became pretty obvious pretty quickly!
+
+HOPEfully, then, this crate is a stop-gap to getting all this merged back into `json-pointer` at some point in
+the future. Before then there is a lot to do -features, tests, docs, better semantics ...
+
+Apart from the `JsonPointerTarget`-related refactoring, I have also made some updates to the code to use the 2021 
+semantics of Rust.
+
+Otherwise, all the code, examples, and tests are those of the original author.
+
+## Read me
 A crate for parsing and using JSON pointers, as specified in [RFC
 6901](https://tools.ietf.org/html/rfc6901). Unlike the `pointer` method
 built into `serde_json`, this handles both validating JSON Pointers before
 use and the URI Fragment Identifier Representation.
-
-[![Build Status](https://travis-ci.org/remexre/json-pointer.svg?branch=master)](https://travis-ci.org/remexre/json-pointer)
-[![crates.io](https://img.shields.io/crates/v/json-pointer.svg)](https://crates.io/crates/json-pointer)
-[![Documentation](https://docs.rs/json-pointer/badge.svg)](https://docs.rs/json-pointer)
 
 ## Creating a JSON Pointer
 
@@ -19,9 +34,9 @@ let from_strs = JsonPointer::new([
     "bar",
 ]);
 let parsed = "/foo/bar".parse::<JsonPointer<_, _>>().unwrap();
+let from_dotted_notation = JsonPointer::new("foo.bar".split('.').collect::<Vec<&str>>());
 
 assert_eq!(from_strs.to_string(), parsed.to_string());
-}
 ```
 
 ## Using a JSON Pointer
@@ -40,7 +55,7 @@ let document = json!({
     "quux": "xyzzy"
 });
 
-let indexed = ptr.get(&document).unwrap();
+let indexed = document.get(&ptr).unwrap();
 
 assert_eq!(indexed, &json!(0));
 ```

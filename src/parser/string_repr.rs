@@ -1,7 +1,6 @@
 //! A parser for JSON pointers.
-
-use JsonPointer;
-use parser::ParseError;
+use crate::parser::ParseError;
+use crate::JsonPointer;
 
 /// A single token encountered when parsing a JSON pointer.
 #[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
@@ -23,10 +22,9 @@ pub enum Escape {
     /// The `/` character, which is escaped as `~1`.
     Slash = 1,
 }
-
-impl Into<char> for Escape {
-    fn into(self) -> char {
-        match self {
+impl From<Escape> for char {
+    fn from(val: Escape) -> Self {
+        match val {
             Escape::Tilde => '~',
             Escape::Slash => '/',
         }
@@ -43,7 +41,7 @@ pub fn parse<II: IntoIterator<Item=char>>(ii: II) -> Result<JsonPointer<String, 
     let mut iter = toks.split(|t| t == &Token::Slash);
 
     // Check to be sure that the JSON pointer started with a slash.
-    if iter.next().map(|s| s.len() > 0).unwrap_or(false) {
+    if iter.next().map(|s| !s.is_empty()).unwrap_or(false) {
         return Err(ParseError::NoLeadingSlash);
     }
 

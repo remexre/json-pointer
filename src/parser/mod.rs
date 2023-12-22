@@ -1,12 +1,12 @@
 mod string_repr;
 mod uri_fragment;
 
-use JsonPointer;
+use crate::JsonPointer;
 
 /// A parser for JSON pointers. If the string starts with a `#`, it is parsed
 /// as a URI fragment. Otherwise, it is parsed in the string representation.
 pub fn parse(s: &str) -> Result<JsonPointer<String, Vec<String>>, ParseError> {
-    if s.chars().next() == Some('#') {
+    if s.starts_with('#') {
         let s = uri_fragment::UnescapeIter::new(s.chars().skip(1)).collect::<Result<String, _>>()?;
         string_repr::parse(s.chars())
     } else {

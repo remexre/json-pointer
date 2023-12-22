@@ -1,8 +1,5 @@
-extern crate json_pointer;
-#[macro_use]
-extern crate serde_json;
-
-use json_pointer::JsonPointer;
+use json_pointer_simd::{JsonPointer,JsonPointerTarget};
+use simd_json::json; // or serde_json::json
 
 fn main() {
     let ptr = JsonPointer::new([
@@ -20,7 +17,7 @@ fn main() {
         "quux": "xyzzy"
     });
 
-    let indexed = ptr.get(&document).unwrap();
+    let indexed = document.get(&ptr).unwrap();
 
     assert_eq!(indexed, &json!(0));
 }

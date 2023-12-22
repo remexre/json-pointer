@@ -1,8 +1,5 @@
-extern crate json_pointer;
-#[macro_use]
-extern crate quickcheck;
-
-use json_pointer::JsonPointer;
+use quickcheck::quickcheck;
+use json_pointer_simd::JsonPointer;
 use quickcheck::TestResult;
 
 quickcheck! {

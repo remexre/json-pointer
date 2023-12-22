@@ -1,21 +1,14 @@
-extern crate json_pointer;
-#[macro_use]
-extern crate lazy_static;
-#[macro_use]
-extern crate quickcheck;
-extern crate regex;
 
 #[macro_use]
 mod macros;
 
-use json_pointer::JsonPointer;
-use quickcheck::TestResult;
+use json_pointer_simd::JsonPointer;
+use once_cell::sync::Lazy;
+use quickcheck::{quickcheck, TestResult};
 use regex::Regex;
 
-lazy_static! {
-    static ref JSON_POINTER_REGEX: Regex = Regex::new("^(/([^/~]|~[01])*)*$").unwrap();
-    static ref URI_FRAGMENT_REGEX: Regex = Regex::new("^#(/([^A-Za-z0-9._!$&'()*+,;=@/?-]|~[01]|%[0-9a-fA-F]{2})*)*$").unwrap();
-}
+static JSON_POINTER_REGEX: Lazy<Regex> = Lazy::new(||Regex::new("^(/([^/~]|~[01])*)*$").unwrap());
+static URI_FRAGMENT_REGEX: Lazy<Regex> = Lazy::new(||Regex::new("^#(/([^A-Za-z0-9._!$&'()*+,;=@/?-]|~[01]|%[0-9a-fA-F]{2})*)*$").unwrap());
 
 quickcheck! {
 
@@ -26,12 +19,12 @@ fn faithful_parse(s: String) -> TestResult {
     let ok = match s.parse::<JsonPointer<_, _>>() {
         Ok(ptr) => if s.chars().next() == Some('#') {
             if URI_FRAGMENT_REGEX.is_match(&s) {
-                (s == ptr.uri_fragment())
+                s == ptr.uri_fragment()
             } else {
                 return TestResult::discard();
             }
         } else {
-            (s == ptr.to_string())
+            s == ptr.to_string()
         },
         Err(_) => return TestResult::discard(),
     };
@@ -49,7 +42,7 @@ fn parses_all_valid(s: String) -> bool {
     let matches_regex = JSON_POINTER_REGEX.is_match(&s) || URI_FRAGMENT_REGEX.is_match(&s);
     let parses = s.parse::<JsonPointer<_, _>>().is_ok();
 
-    (matches_regex == parses)
+    matches_regex == parses
 }
 
 }

@@ -1,8 +1,8 @@
 use json_pointer_simd::{JsonPointer,JsonPointerTarget};
 use once_cell::sync::Lazy;
-use serde_json::{Value,json};
+use simd_json::{OwnedValue,json};
 
-static JSON: Lazy<Value> = Lazy::new(||
+static JSON: Lazy<OwnedValue> = Lazy::new(||
     json!({
         "foo": ["bar", "baz"],
         "": 0,
@@ -25,7 +25,7 @@ macro_rules! rfc_tests {
         fn rfc_tests() {
             $({
                 let ptr = $ptr.parse::<JsonPointer<_, _>>().unwrap();
-                let value = <Value as JsonPointerTarget>::get(&JSON,&ptr);
+                let value = JSON.get(&ptr);
                 assert_eq!(value.unwrap(), &json!($json));
             })*
         }
