@@ -2,14 +2,15 @@ use std::ops::{Index, IndexMut};
 use crate::{JsonPointer, JsonPointerTarget, IndexError};
 use simd_json::value::owned::Value;
 
+/// 
 /// Implement getting for SIMD JSON Owned values
 ///
-impl<S: AsRef<str>, C: AsRef<[S]>> JsonPointerTarget<Value> for JsonPointer<S, C> {
+impl JsonPointerTarget for Value {
 
     /// Attempts to get a reference to a value from the given JSON value,
     /// returning an error if it can't be found.
-    fn get<'json>(&self, val: &'json Value) -> Result<&'json Value, IndexError> {
-        self.ref_toks.as_ref().iter().try_fold(val, |val, tok| {
+    fn get<'value, S: AsRef<str>, C: AsRef<[S]>>(&'value self, ptr: &JsonPointer<S,C>) -> Result<&'value Self, IndexError> {
+        ptr.ref_toks.as_ref().iter().try_fold(self, |val, tok| {
             let tok = tok.as_ref();
             match *val {
                 Value::Object(ref obj) => obj.get(tok).ok_or_else(|| IndexError::NoSuchKey(tok.to_owned())),
@@ -30,8 +31,8 @@ impl<S: AsRef<str>, C: AsRef<[S]>> JsonPointerTarget<Value> for JsonPointer<S, C
 
     /// Attempts to get a mutable reference to a value from the given JSON
     /// value, returning an error if it can't be found.
-    fn get_mut<'json>(&self, val: &'json mut Value) -> Result<&'json mut Value, IndexError> {
-        self.ref_toks.as_ref().iter().try_fold(val, |val, tok| {
+    fn get_mut<'value, S: AsRef<str>, C: AsRef<[S]>>(&'value mut self, ptr: &JsonPointer<S,C>) -> Result<&'value mut Self, IndexError> {
+        ptr.ref_toks.as_ref().iter().try_fold(self, |val, tok| {
             let tok = tok.as_ref();
             match *val {
                 Value::Object(ref mut obj) => obj.get_mut(tok).ok_or_else(|| IndexError::NoSuchKey(tok.to_owned())),
@@ -52,8 +53,8 @@ impl<S: AsRef<str>, C: AsRef<[S]>> JsonPointerTarget<Value> for JsonPointer<S, C
 
     /// Attempts to get an owned value from the given JSON value, returning an
     /// error if it can't be found.
-    fn get_owned(&self, val: Value) -> Result<Value, IndexError> {
-        self.ref_toks.as_ref().iter().try_fold(val, |val, tok| {
+    fn get_owned<'value, S: AsRef<str>, C: AsRef<[S]>>(self, ptr: &JsonPointer<S,C>) -> Result<Self, IndexError> {
+        ptr.ref_toks.as_ref().iter().try_fold(self, |val, tok| {
             let tok = tok.as_ref();
             match val {
                 Value::Object(mut obj) => obj.remove(tok).ok_or_else(|| IndexError::NoSuchKey(tok.to_owned())),
@@ -80,12 +81,12 @@ impl<S: AsRef<str>, C: AsRef<[S]>> JsonPointerTarget<Value> for JsonPointer<S, C
 impl<'a, S: AsRef<str>, C: AsRef<[S]>> Index<&'a JsonPointer<S, C>> for Value {
     type Output = Value;
     fn index(&self, ptr: &'a JsonPointer<S, C>) -> &Value {
-        ptr.get(self).unwrap()
+        self.get(ptr).unwrap()
     }
 }
 
 impl<'a, S: AsRef<str>, C: AsRef<[S]>> IndexMut<&'a JsonPointer<S, C>> for Value {
     fn index_mut(&mut self, ptr: &'a JsonPointer<S, C>) -> &mut Value {
-        ptr.get_mut(self).unwrap()
+        self.get_mut(ptr).unwrap()
     }
 }

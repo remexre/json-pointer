@@ -55,7 +55,7 @@ let document = json!({
     "quux": "xyzzy"
 });
 
-let indexed = ptr.get(&document).unwrap();
+let indexed = document.get(&ptr).unwrap();
 
 assert_eq!(indexed, &json!(0));
 ```

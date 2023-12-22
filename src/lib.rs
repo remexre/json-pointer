@@ -1,32 +1,46 @@
-//! A crate for parsing and using JSON pointers with [simd_json] values, as specified in [RFC
-//! 6901](https://tools.ietf.org/html/rfc6901). Unlike the `pointer` method
-//! built into `serde_json`, this handles both validating JSON Pointers before
-//! use and the URI Fragment Identifier Representation.
+//! A crate for parsing and using JSON pointers with [simd_json] and [serde_json] values.
+//! 
+//! The functionality is specified in [RFC 6901](https://tools.ietf.org/html/rfc6901). 
+//! 
+//! In the case of [serde_json], unlike nlike the `pointer` method, this handles both 
+//! validating JSON Pointers before use and the URI Fragment Identifier Representation.
+//! 
+//! In the case of [simd_json], this crate provides that missing functionality.
 //!
 //! ## Creating a JSON Pointer
 //! 
-//! JSON pointers can be created with a literal `[&str]`, or parsed from a `String`.
+//! JSON pointers can be parsed from any thing that can interpreted a s string slice 
+//! expressed in standard JSON Pointer syntax, or created from anything that can be 
+//! loosely represented as a vector or array of `&str`.
 //! 
 //! ```rust
-//! use json_pointer_simd::{JsonPointer,JsonPointerValueGetter};
+//! use json_pointer_simd::{JsonPointer,JsonPointerTarget};
 //!
 //! let from_strs = JsonPointer::new([
 //!     "foo",
 //!     "bar",
 //! ]);
 //! let parsed = "/foo/bar".parse::<JsonPointer<_, _>>().unwrap();
+//! let from_dotted_notation = JsonPointer::new("foo.bar".split('.').collect::<Vec<&str>>());
 //! 
 //! assert_eq!(from_strs.to_string(), parsed.to_string());
+//! assert_eq!(from_strs.to_string(), from_dotted_notation.to_string());
 //! ```
 //! 
 //! ## Using a JSON Pointer
 //! 
-//! The `JsonPointer` type provides `.get()` and `.get_mut()`, to get references
+//! The `JsonPointerTarget` trait provides `.get()` and `.get_mut()`, to get references
 //! and mutable references to the appropriate value, respectively.
+//! 
+//! As delivered, this is implemented on [serde_json] values and [simd_json] values, though
+//! the former is a little more verbose to use than the latter due to the pre-existence of
+//! these methods on [serde_json] values 
+//! 
+//! For [simd_json]:
 //! 
 //! ```rust
 //! use simd_json::json;
-//! use json_pointer_simd::{JsonPointer,JsonPointerValueGetter};
+//! use json_pointer_simd::{JsonPointer,JsonPointerTarget};
 //!
 //! let ptr = "/foo/bar".parse::<JsonPointer<_, _>>().unwrap();
 //! 
@@ -37,7 +51,27 @@
 //!     },
 //!     "quux": "xyzzy"
 //! });
-//! let indexed = ptr.get(&document).unwrap();
+//! let indexed = document.get(&ptr).unwrap();
+//! 
+//! assert_eq!(indexed, &json!(0));
+//! ```
+//! 
+//! For [serde_json]:
+//! 
+//! ```rust
+//! use serde_json::{json, Value};
+//! use json_pointer_simd::{JsonPointer,JsonPointerTarget};
+//!
+//! let ptr = "/foo/bar".parse::<JsonPointer<_, _>>().unwrap();
+//! 
+//! let document = json!({
+//!     "foo": {
+//!         "bar": 0,
+//!         "baz": 1,
+//!     },
+//!     "quux": "xyzzy"
+//! });
+//! let indexed = <Value as JsonPointerTarget>::get(&document,&ptr).unwrap();
 //! 
 //! assert_eq!(indexed, &json!(0));
 //! ```
@@ -51,7 +85,7 @@
 //! crate does not support parsing full URIs.
 //! 
 //! ```rust
-//! use json_pointer_simd::{JsonPointer,JsonPointerValueGetter};
+//! use json_pointer_simd::{JsonPointer,JsonPointerTarget};
 //!
 //! let str_ptr = "/f%o".parse::<JsonPointer<_, _>>().unwrap();
 //! let uri_ptr = "#/f%25o".parse::<JsonPointer<_, _>>().unwrap();
@@ -73,17 +107,17 @@ pub use ptr::JsonPointer;
 
 ///
 /// The trait that provides access to the data referenced by the JsonPointer.
-/// This trait is implemented for both [OwnedValue] and [BorrowedValue].
-/// 
-pub trait JsonPointerTarget<V> {
+///
+pub trait JsonPointerTarget 
+    where Self: Sized{
 
-    /// Attempts to get a reference to a value from the given JSON value,
+    /// Attempts to get a reference to a value from self,
     /// returning an error if it can't be found.
-	fn get<'json>(&self, val: &'json V) -> Result<&'json V, IndexError>;
-    /// Attempts to get a mutable reference to a value from the given JSON
-    /// value, returning an error if it can't be found.
-	fn get_mut<'json>(&self, val: &'json mut V) -> Result<&'json mut V, IndexError>;
-    /// Attempts to get an owned value from the given JSON value, returning an
+	fn get<'json,S: AsRef<str>, C: AsRef<[S]>>(&'json self, ptr: &JsonPointer<S,C>) -> Result<&'json Self, IndexError>;
+    /// Attempts to get a mutable reference to a value from self
+    /// returning an error if it can't be found.
+	fn get_mut<'json,S: AsRef<str>, C: AsRef<[S]>>(&'json mut self, ptr: &JsonPointer<S,C>) -> Result<&'json mut Self, IndexError>;
+    /// Attempts to get an owned value from self, returning an
     /// error if it can't be found.
-	fn get_owned(&self, val: V) -> Result<V, IndexError>;
+	fn get_owned<S: AsRef<str>, C: AsRef<[S]>>(self, ptr: &JsonPointer<S,C>) -> Result<Self, IndexError>;
 }
