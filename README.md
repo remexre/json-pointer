@@ -1,16 +1,20 @@
 # json-pointer
 
 ## Preamble
-This crate is a straight conversion of the [json-pointer](https://github.com/remexre/json-pointer) crate, but for use
-with `simd_json` instead of `serde_json`. While `simd_json` and `serde_json` expose
-similar APIs, neither attempts to implement the traits of the other, making an 
-across-the-board generic implementation quite difficult to achieve. So, instead, I
-opted to fork the original project and adapt it to `simd_json` Value types. The fact
-is that if you are persuaded by the benefits of `simd_json`, you can pretty much drop it
-into standard ser/deser workloads in place of `serde_json`. You can then us this
-to replace [json-pointer](https://github.com/remexre/json-pointer) for pointer access.
+This crate is a generalization of the [json-pointer](https://github.com/remexre/json-pointer) crate.
 
-I also made some updates to the code to use the 2021 semantics of Rust.
+It opens up the target of the JSON pointer to anything that can be adapted using the `JsonPointerTarget`
+trait. The odd name of the crate (_.simd_) comes from the first use case and first attempt at implementation -
+- using JSON Pointers with [simd-json](https://docs.rs/simd-json/latest/simd_json) Values.
+
+But one learns in these efforts and the back-implementation of the `JsonPointerTarget` trait to re-include 
+[serde_json] values became pretty obvious pretty quickly!
+
+HOPEfully, then, this crate is a stop-gap to getting all this merged back into `json-pointer` at some point in
+the future. Before then there is a lot to do -features, tests, docs, better semantics ...
+
+Apart from the `JsonPointerTarget`-related refactoring, I have also made some updates to the code to use the 2021 
+semantics of Rust.
 
 Otherwise, all the code, examples, and tests are those of the original author.
 
@@ -30,9 +34,9 @@ let from_strs = JsonPointer::new([
     "bar",
 ]);
 let parsed = "/foo/bar".parse::<JsonPointer<_, _>>().unwrap();
+let from_dotted_notation = JsonPointer::new("foo.bar".split('.').collect::<Vec<&str>>());
 
 assert_eq!(from_strs.to_string(), parsed.to_string());
-}
 ```
 
 ## Using a JSON Pointer

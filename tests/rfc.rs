@@ -1,5 +1,5 @@
 use json_pointer_simd::JsonPointer;
-use json_pointer_simd::JsonPointerValueGetter;
+use json_pointer_simd::JsonPointerTarget;
 use once_cell::sync::Lazy;
 use simd_json::OwnedValue;
 use simd_json::json;

@@ -1,18 +1,19 @@
 use std::ops::{Index, IndexMut};
-use crate::{JsonPointer, JsonPointerValueGetter, IndexError};
+use crate::{JsonPointer, JsonPointerTarget, IndexError};
+use simd_json::value::borrowed::Value;
 
 /// Implement getting for SIMD JSON Borrowed values
 ///
-impl<'value,S: AsRef<str>, C: AsRef<[S]>> JsonPointerValueGetter<simd_json::BorrowedValue<'value>> for JsonPointer<S, C> {
+impl<'value,S: AsRef<str>, C: AsRef<[S]>> JsonPointerTarget<Value<'value>> for JsonPointer<S, C> {
 
     /// Attempts to get a reference to a value from the given JSON value,
     /// returning an error if it can't be found.
-    fn get<'json>(&self, val: &'json simd_json::BorrowedValue<'value>) -> Result<&'json simd_json::BorrowedValue<'value>, IndexError> {
+    fn get<'json>(&self, val: &'json Value<'value>) -> Result<&'json Value<'value>, IndexError> {
         self.ref_toks.as_ref().iter().try_fold(val, |val, tok| {
             let tok = tok.as_ref();
             match *val {
-                simd_json::BorrowedValue::Object(ref obj) => obj.get(tok).ok_or_else(|| IndexError::NoSuchKey(tok.to_owned())),
-                simd_json::BorrowedValue::Array(ref arr) => {
+                Value::Object(ref obj) => obj.get(tok).ok_or_else(|| IndexError::NoSuchKey(tok.to_owned())),
+                Value::Array(ref arr) => {
                     let idx = if tok == "-" {
                         arr.len()
                     } else if let Ok(idx) = tok.parse() {
@@ -29,12 +30,12 @@ impl<'value,S: AsRef<str>, C: AsRef<[S]>> JsonPointerValueGetter<simd_json::Borr
 
     /// Attempts to get a mutable reference to a value from the given JSON
     /// value, returning an error if it can't be found.
-    fn get_mut<'json>(&self, val: &'json mut simd_json::BorrowedValue<'value>) -> Result<&'json mut simd_json::BorrowedValue<'value>, IndexError> {
+    fn get_mut<'json>(&self, val: &'json mut Value<'value>) -> Result<&'json mut Value<'value>, IndexError> {
         self.ref_toks.as_ref().iter().try_fold(val, |val, tok| {
             let tok = tok.as_ref();
             match *val {
-                simd_json::BorrowedValue::Object(ref mut obj) => obj.get_mut(tok).ok_or_else(|| IndexError::NoSuchKey(tok.to_owned())),
-                simd_json::BorrowedValue::Array(ref mut arr) => {
+                Value::Object(ref mut obj) => obj.get_mut(tok).ok_or_else(|| IndexError::NoSuchKey(tok.to_owned())),
+                Value::Array(ref mut arr) => {
                     let idx = if tok == "-" {
                         arr.len()
                     } else if let Ok(idx) = tok.parse() {
@@ -51,12 +52,12 @@ impl<'value,S: AsRef<str>, C: AsRef<[S]>> JsonPointerValueGetter<simd_json::Borr
 
     /// Attempts to get an owned value from the given JSON value, returning an
     /// error if it can't be found.
-    fn get_owned(&self, val: simd_json::BorrowedValue<'value>) -> Result<simd_json::BorrowedValue<'value>, IndexError> {
+    fn get_owned(&self, val: Value<'value>) -> Result<Value<'value>, IndexError> {
         self.ref_toks.as_ref().iter().try_fold(val, |val, tok| {
             let tok = tok.as_ref();
             match val {
-                simd_json::BorrowedValue::Object(mut obj) => obj.remove(tok).ok_or_else(|| IndexError::NoSuchKey(tok.to_owned())),
-                simd_json::BorrowedValue::Array(mut arr) => {
+                Value::Object(mut obj) => obj.remove(tok).ok_or_else(|| IndexError::NoSuchKey(tok.to_owned())),
+                Value::Array(mut arr) => {
                     let idx = if tok == "-" {
                         arr.len()
                     } else if let Ok(idx) = tok.parse() {
@@ -76,15 +77,15 @@ impl<'value,S: AsRef<str>, C: AsRef<[S]>> JsonPointerValueGetter<simd_json::Borr
     }
 }
 
-impl<'a, S: AsRef<str>, C: AsRef<[S]>> Index<&'a JsonPointer<S, C>> for simd_json::BorrowedValue<'a> {
-    type Output = simd_json::BorrowedValue<'a>;
-    fn index(&self, ptr: &'a JsonPointer<S, C>) -> &simd_json::BorrowedValue<'a> {
+impl<'a, S: AsRef<str>, C: AsRef<[S]>> Index<&'a JsonPointer<S, C>> for Value<'a> {
+    type Output = Value<'a>;
+    fn index(&self, ptr: &'a JsonPointer<S, C>) -> &Value<'a> {
         ptr.get(self).unwrap()
     }
 }
 
-impl<'a, S: AsRef<str>, C: AsRef<[S]>> IndexMut<&'a JsonPointer<S, C>> for simd_json::BorrowedValue<'a> {
-    fn index_mut(&mut self, ptr: &'a JsonPointer<S, C>) -> &mut simd_json::BorrowedValue<'a> {
+impl<'a, S: AsRef<str>, C: AsRef<[S]>> IndexMut<&'a JsonPointer<S, C>> for Value<'a> {
+    fn index_mut(&mut self, ptr: &'a JsonPointer<S, C>) -> &mut Value<'a> {
         ptr.get_mut(self).unwrap()
     }
 }

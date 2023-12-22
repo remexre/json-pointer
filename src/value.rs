@@ -1,6 +1,6 @@
 use std::ops::{Index, IndexMut};
 use crate::{JsonPointer, JsonPointerTarget, IndexError};
-use simd_json::value::owned::Value;
+use serde_json::Value;
 
 /// Implement getting for SIMD JSON Owned values
 ///

@@ -64,6 +64,7 @@
 mod parser;
 mod owned;
 mod borrowed;
+mod value;
 mod ptr;
 
 pub use parser::ParseError;
@@ -74,8 +75,7 @@ pub use ptr::JsonPointer;
 /// The trait that provides access to the data referenced by the JsonPointer.
 /// This trait is implemented for both [OwnedValue] and [BorrowedValue].
 /// 
-pub trait JsonPointerValueGetter<V> 
-	where V: simd_json::base::TypedValue {
+pub trait JsonPointerTarget<V> {
 
     /// Attempts to get a reference to a value from the given JSON value,
     /// returning an error if it can't be found.

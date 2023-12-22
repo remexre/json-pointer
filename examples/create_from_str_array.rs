@@ -1,6 +1,6 @@
 use json_pointer_simd::JsonPointer;
 use simd_json::json;
-use json_pointer_simd::JsonPointerValueGetter;
+use json_pointer_simd::JsonPointerTarget;
 
 fn main() {
     let ptr = JsonPointer::new([
